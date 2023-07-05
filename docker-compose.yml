@@ -31,8 +31,20 @@ services:
     command: --cortex-port 9001
     volumes:
       - thehive-data:/app/data
+  grafana:
+    image: grafana/grafana:8.2.1
+    ports:
+      - "0.0.0.0:3000:3000"
+    depends_on:
+      - thehive
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
 
 volumes:
   elasticsearch-data:
   cortex-data:
   thehive-data:
+  grafana-data:
