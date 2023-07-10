@@ -40,7 +40,7 @@ services:
     volumes:
       - thehive-data:/app/data
       - ./application.conf:/opt/thehive/conf/application.conf
-     environment:
+    environment:
       - THEHIVE_CASSANDRA_CONTACTPOINTS=172.24.0.5:9042 # New line: Specify the Cassandra contact points
       - THEHIVE_CASSANDRA_KEYSPACE=thehive # New line: Specify the keyspace name
       - THEHIVE_CASSANDRA_USERNAME=admin  # New line: Specify the Cassandra username
