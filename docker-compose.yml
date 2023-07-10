@@ -57,7 +57,7 @@ services:
       - CASSANDRA_USERNAME=admin
       - CASSANDRA_PASSWORD=admin
     command: >
-      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {\'class\': \'SimpleStrategy\', \'replication_factor\': \'1\'};' | cqlsh -u admin -p admin --cqlshrc /etc/cassandra/cqlshrc && /docker-entrypoint.sh cassandra -f"
+      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {\'class\': \'SimpleStrategy\', \'replication_factor\': \'1\'};' | cqlsh -u admin -p admin && /docker-entrypoint.sh cassandra -f"
     networks:
       thehive-net:
         ipv4_address: 172.24.0.5
