@@ -33,6 +33,7 @@ services:
     depends_on:
       - elasticsearch
       - cortex
+      - cassandra
     ports:
       - "0.0.0.0:9000:9000"
     command: --cortex-port 9001
@@ -55,7 +56,10 @@ services:
     environment:
       - CASSANDRA_USERNAME=admin
       - CASSANDRA_PASSWORD=admin
-      - CASSANDRA_KEYSPACE=thehive
+      - CASSANDRA_AUTO_BOOTSTRAP=false
+      - CASSANDRA_CONFIG=/etc/cassandra
+    command: >
+      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {\'class\': \'SimpleStrategy\', \'replication_factor\': \'1\'};' | cqlsh -u admin -p admin --cqlshrc /etc/cassandra/cqlshrc && /docker-entrypoint.sh cassandra -f"
     networks:
       thehive-net:
         ipv4_address: 172.24.0.5
