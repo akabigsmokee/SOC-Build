@@ -40,9 +40,11 @@ services:
     volumes:
       - thehive-data:/app/data
       - ./application.conf:/opt/thehive/conf/application.conf
-    environment:
-    - THEHIVE_CASSANDRA_CONTACTPOINTS=172.24.0.5:9042 # New line: Specify the Cassandra contact points
-    - THEHIVE_CASSANDRA_KEYSPACE=thehive # New line: Specify the keyspace name
+     environment:
+      - THEHIVE_CASSANDRA_CONTACTPOINTS=172.24.0.5:9042 # New line: Specify the Cassandra contact points
+      - THEHIVE_CASSANDRA_KEYSPACE=thehive # New line: Specify the keyspace name
+      - THEHIVE_CASSANDRA_USERNAME=admin  # New line: Specify the Cassandra username
+      - THEHIVE_CASSANDRA_PASSWORD=admin # New line: Specify the Cassandra password
     networks:
       thehive-net:
         ipv4_address: 172.24.0.4
@@ -57,7 +59,7 @@ services:
       - CASSANDRA_USERNAME=admin
       - CASSANDRA_PASSWORD=admin
     command: >
-      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {\'class\': \'SimpleStrategy\', \'replication_factor\': \'1\'};' | cqlsh -u admin -p admin && /docker-entrypoint.sh cassandra -f"
+      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};' | cqlsh -u admin -p admin --cqlshrc /etc/cassandra/cqlshrc && /docker-entrypoint.sh cassandra -f"
     networks:
       thehive-net:
         ipv4_address: 172.24.0.5
