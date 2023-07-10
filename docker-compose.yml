@@ -1,4 +1,5 @@
-version: "2"
+version: "3.9"
+
 services:
   elasticsearch:
     image: elasticsearch:7.9.1
@@ -11,6 +12,9 @@ services:
         hard: 65536
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.2
 
   cortex:
     image: thehiveproject/cortex:3.1.0-1
@@ -20,6 +24,9 @@ services:
       - "0.0.0.0:9001:9001"
     volumes:
       - cortex-data:/app/data
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.3
 
   thehive:
     image: thehiveproject/thehive:3.5.0-1
@@ -31,6 +38,28 @@ services:
     command: --cortex-port 9001
     volumes:
       - thehive-data:/app/data
+      - ./application.conf:/opt/thehive/conf/application.conf
+    environment:
+    - THEHIVE_CASSANDRA_CONTACTPOINTS=172.24.0.5:9042 # New line: Specify the Cassandra contact points
+    - THEHIVE_CASSANDRA_KEYSPACE=thehive # New line: Specify the keyspace name
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.4
+
+  cassandra:
+    image: cassandra:3.11.12
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra-data:/var/lib/cassandra
+    environment:
+      - CASSANDRA_USERNAME=admin
+      - CASSANDRA_PASSWORD=admin
+      - CASSANDRA_KEYSPACE=thehive
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.5
+
   grafana:
     image: grafana/grafana:8.2.1
     ports:
@@ -42,9 +71,23 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana-data:/var/lib/grafana
+    command: >
+      sh -c "grafana-cli plugins install hadesarchitect-cassandra-datasource;
+             /run.sh"
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.6
+
+networks:
+  thehive-net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.24.0.0/16
 
 volumes:
   elasticsearch-data:
   cortex-data:
   thehive-data:
+  cassandra-data:
   grafana-data:
