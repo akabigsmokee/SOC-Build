@@ -1,4 +1,4 @@
- version: "3"
+version: "3"
 services:
   thehive:
     image: strangebee/thehive:5.2
