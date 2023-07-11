@@ -1,68 +1,100 @@
-version: "3.9"
-
+ version: "3"
 services:
-  elasticsearch:
-    image: elasticsearch:7.9.1
-    environment:
-      - http.host=0.0.0.0
-      - discovery.type=single-node
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    networks:
-      thehive-net:
-        ipv4_address: 172.24.0.2
-
-  cortex:
-    image: thehiveproject/cortex:3.1.0-1
-    depends_on:
-      - elasticsearch
-    ports:
-      - "0.0.0.0:9001:9001"
-    volumes:
-      - cortex-data:/app/data
-    networks:
-      thehive-net:
-        ipv4_address: 172.24.0.3
-
   thehive:
-    image: thehiveproject/thehive:3.5.0-1
+    image: strangebee/thehive:5.2
     depends_on:
-      - elasticsearch
-      - cortex
       - cassandra
+      - elasticsearch
+      - minio
+      - cortex
+    mem_limit: 1500m
     ports:
-      - "0.0.0.0:9000:9000"
-    command: --cortex-port 9001
-    volumes:
-      - thehive-data:/app/data
-      - ./application.conf:/opt/thehive/conf/application.conf
+      - "9000:9000"
     environment:
-      - THEHIVE_CASSANDRA_CONTACTPOINTS=172.24.0.5:9042 # New line: Specify the Cassandra contact points
-      - THEHIVE_CASSANDRA_KEYSPACE=thehive # New line: Specify the keyspace name
-      - THEHIVE_CASSANDRA_USERNAME=admin  # New line: Specify the Cassandra username
-      - THEHIVE_CASSANDRA_PASSWORD=admin # New line: Specify the Cassandra password
+      - JVM_OPTS="-Xms1024M -Xmx1024M"
+    command:
+      - --secret
+      - "mySecretForTheHive"
+      - "--cql-hostnames"
+      - "cassandra"
+      - "--index-backend"
+      - "elasticsearch"
+      - "--es-hostnames"
+      - "elasticsearch"
+      #- "--s3-endpoint"
+      #- "http://minio:9000"
+      #- "--s3-access-key"
+      #- "minioadmin"
+      #- "--s3-secret-key"
+      #- "minioadmin"
+      #- "--s3-bucket"
+      #- "thehive"
+      #- "--s3-use-path-access-style"
+      - "--cortex-hostnames"
+      - "cortex"
+      #- "--cortex-keys"
+      # put cortex api key once cortex is bootstraped
+      #- "<cortex_api_key>"
     networks:
       thehive-net:
         ipv4_address: 172.24.0.4
 
   cassandra:
-    image: cassandra:3.11.12
+    image: 'cassandra:4'
+    mem_limit: 1000m
     ports:
       - "9042:9042"
-    volumes:
-      - cassandra-data:/var/lib/cassandra
     environment:
-      - CASSANDRA_USERNAME=admin
-      - CASSANDRA_PASSWORD=admin
-    command: >
-      sh -c "echo 'CREATE KEYSPACE IF NOT EXISTS thehive WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};' | cqlsh -u admin -p admin --cqlshrc /etc/cassandra/cqlshrc && /docker-entrypoint.sh cassandra -f"
+      - CASSANDRA_CLUSTER_NAME=TheHive
+    volumes:
+      - cassandradata:/var/lib/cassandra
     networks:
       thehive-net:
         ipv4_address: 172.24.0.5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    mem_limit: 512m
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    volumes:
+      - elasticsearchdata:/usr/share/elasticsearch/data
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.2
+
+  minio:
+    image: quay.io/minio/minio
+    mem_limit: 512m
+    command: ["minio", "server", "/data", "--console-address", ":9090"]
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    ports:
+      - "9090:9090"
+    volumes:
+      - "miniodata:/data"
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.7
+
+  cortex:
+    image: thehiveproject/cortex:3.1.7
+    environment:
+      - job_directory=/tmp/cortex-jobs
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /tmp/cortex-jobs:/tmp/cortex-jobs
+    depends_on:
+      - elasticsearch
+    ports:
+      - "9001:9001"
+    networks:
+      thehive-net:
+        ipv4_address: 172.24.0.3
 
   grafana:
     image: grafana/grafana:8.2.1
@@ -75,9 +107,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana-data:/var/lib/grafana
-    command: >
-      sh -c "grafana-cli plugins install hadesarchitect-cassandra-datasource;
-             /run.sh"
     networks:
       thehive-net:
         ipv4_address: 172.24.0.6
@@ -90,8 +119,7 @@ networks:
         - subnet: 172.24.0.0/16
 
 volumes:
-  elasticsearch-data:
-  cortex-data:
-  thehive-data:
-  cassandra-data:
+  miniodata:
+  cassandradata:
+  elasticsearchdata:
   grafana-data:
