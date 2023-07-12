@@ -98,7 +98,7 @@ services:
         ipv4_address: 172.24.0.3
 
   grafana:
-    image: grafana/grafana:8.2.1
+    image: grafana/grafana:latest
     ports:
       - "0.0.0.0:3000:3000"
     depends_on:
