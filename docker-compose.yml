@@ -49,6 +49,7 @@ services:
       - CASSANDRA_CLUSTER_NAME=TheHive
     volumes:
       - cassandradata:/var/lib/cassandra
+    mem_limit: 2g
     networks:
       thehive-net:
         ipv4_address: 172.24.0.5
