@@ -2,121 +2,40 @@
 <html>
 <head>
     <title>Welcome to My Website</title>
-    <style>
-        /* Basic CSS Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f8f8;
-            padding: 20px;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Logo Styles */
-        .logo {
-            display: block;
-            width: 150px; /* Adjust the logo size as needed */
-            margin: 0 auto;
-        }
-
-        /* Charts Placeholder */
-        .chart-placeholder {
-            background-color: #f8f9fa;
-            height: 300px;
-        }
-
-        /* Responsive Grid */
-        .row::after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
-        .col {
-            float: left;
-            width: 100%;
-            padding: 10px;
-        }
-
-        @media (min-width: 768px) {
-            .col {
-                width: 50%;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .col {
-                width: 33.33%;
-            }
-        }
-
-        /* Custom CSS for Links */
-        .service-link {
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            color: #333;
-            font-size: 18px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            transition: background-color 0.3s ease-in-out;
-        }
-
-        .service-link:hover {
-            background-color: #d0d0d0;
-        }
-    </style>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <a href="#" id="thehive-link" class="service-link">
-                    <img src="thehive.png" alt="TheHive Logo" class="logo">
-                    Visit TheHive
+    <div class="container mt-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-6 col-md-4 text-center">
+                <a href="#" class="rounded-circle service-link" id="thehive-link">
+                    <img src="thehive.png" alt="TheHive Logo" class="img-fluid logo">
                 </a>
             </div>
-            <div class="col">
-                <div class="chart-placeholder" id="thehive-chart"></div>
-            </div>
-            <div class="col">
-                <a href="#" id="cortex-link" class="service-link">
-                    <img src="cortex.png" alt="Cortex Logo" class="logo">
-                    Visit Cortex
+            <div class="col-6 col-md-4 text-center">
+                <a href="#" class="rounded-circle service-link" id="cortex-link">
+                    <img src="cortex.png" alt="Cortex Logo" class="img-fluid logo">
                 </a>
             </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="chart-placeholder" id="cortex-chart"></div>
-            </div>
-            <div class="col">
-                <a href="#" id="grafana-link" class="service-link">
-                    <img src="grafana_logo_icon_171048.png" alt="Grafana Logo" class="logo">
-                    Visit Grafana
+            <div class="col-6 col-md-4 text-center">
+                <a href="#" class="rounded-circle service-link" id="grafana-link">
+                    <img src="grafana_logo_icon_171048.png" alt="Grafana Logo" class="img-fluid logo">
                 </a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <div class="chart-placeholder" id="grafana-chart"></div>
             </div>
         </div>
     </div>
+
+    <!-- Add Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.min.js"></script>
+    
+    <style>
+        /* Custom CSS */
+        .logo {
+            width: 150px;
+            height: 150px;
+        }
+    </style>
 
     <script>
         // Function to get the server's IP address
